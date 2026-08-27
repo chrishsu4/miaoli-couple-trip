@@ -28,20 +28,31 @@ const reminders=[
  {title:'預訂棗莊晚餐',detail:'10/10 18:30 · 告知素食人數',href:'tel:037239108',action:'撥打 037-239108'},
  {title:'預訂禪廚午餐',detail:'10/11 11:30 · 合菜需事先預訂',href:'https://www.opentable.com.tw/restaurant/profile/262994',action:'線上訂位 ↗'},
  {title:'確認民宿入住',detail:'確認房型、入住時間與停車位置',href:'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('簡單窩窩民宿 苗栗'),action:'查看地圖 ↗'},
- {title:'準備共同公積金',detail:'建議每人 NT$ 3,000，多退少補',href:'#ledger',action:'前往記帳 ↓'}
+ {title:'準備共同公積金',detail:'5 人共 NT$ 15,000，每人 NT$ 3,000',href:'#ledger',action:'前往記帳 ↓'}
 ];
 const mapUrl=q=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q);
+const travelers=['純瑄','豐勳','旅伴 A','旅伴 B','旅伴 C'];
 let activeDay=0;
 let expenses=JSON.parse(localStorage.getItem('miaoli-expenses')||'null')||[
- {id:1,title:'共同公積金',amount:6000,payer:'公積金',category:'入金',date:'2026-10-09'}
+ {id:1,title:'共同公積金',amount:15000,payer:'公積金',category:'入金',date:'2026-10-09'}
 ];
+// 將舊版兩人公積金自動升級為五人版本，保留其他記帳資料。
+if(localStorage.getItem('miaoli-budget-version')!=='5-person'){
+ const fund=expenses.find(e=>e.category==='入金'&&e.title==='共同公積金');
+ if(fund&&fund.amount===6000) fund.amount=15000;
+ localStorage.setItem('miaoli-budget-version','5-person');
+}
+if(localStorage.getItem('miaoli-payer-version')!=='named'){
+ expenses.forEach(e=>{if(e.payer==='我')e.payer='純瑄';if(e.payer==='另一半')e.payer='豐勳'});
+ localStorage.setItem('miaoli-payer-version','named');
+}
 let checks=JSON.parse(localStorage.getItem('miaoli-reminders')||'[]');
 const $=s=>document.querySelector(s); const money=n=>'NT$ '+Number(n).toLocaleString('zh-TW');
 
 function renderTabs(){ $('.day-tabs').innerHTML=days.map((d,i)=>`<button role="tab" aria-selected="${i===activeDay}" class="${i===activeDay?'active':''}" data-day="${i}">${d.label}</button>`).join(''); }
 function renderDay(){const d=days[activeDay];$('#daySummary').innerHTML=`<div><h3>${d.label} · ${d.date}</h3><p>${d.theme}</p></div><span class="weather-note">♡ ${d.note}</span>`;$('#timeline').innerHTML=d.stops.map(s=>`<article class="stop"><time>${s[0]}</time><span class="dot"></span><div class="stop-card"><div><h3>${s[1]}</h3><p>${s[2]}</p><div class="tags">${s[4].map(t=>`<span class="tag">${t}</span>`).join('')}</div></div><div class="stop-actions"><a class="icon-btn" href="${mapUrl(s[3])}" target="_blank" rel="noopener" aria-label="在 Google 地圖開啟 ${s[1]}">⌖ 地圖</a></div></div></article>`).join('');}
 function renderReminders(){$('#reminderList').innerHTML=reminders.map((r,i)=>`<article class="reminder ${checks.includes(i)?'done':''}"><button class="check" data-check="${i}" aria-label="${checks.includes(i)?'標示未完成':'標示完成'}">${checks.includes(i)?'✓':''}</button><div><h3>${r.title}</h3><p>${r.detail}</p></div><a href="${r.href}" ${r.href.startsWith('http')?'target="_blank" rel="noopener"':''}>${r.action}</a></article>`).join('')}
-function renderLedger(){const funds=expenses.filter(e=>e.category==='入金').reduce((a,e)=>a+e.amount,0), spent=expenses.filter(e=>e.category!=='入金').reduce((a,e)=>a+e.amount,0),balance=funds-spent;$('#balance').textContent=money(balance);$('#fundTotal').textContent=money(funds);$('#spentTotal').textContent=money(spent);$('#budgetProgress').style.width=Math.min(100,funds?spent/funds*100:0)+'%';$('#budgetHint').textContent=balance<0?`已超支 ${money(Math.abs(balance))}`:'建議每人預收 NT$ 3,000';const list=expenses.filter(e=>e.category!=='入金').sort((a,b)=>b.id-a.id);$('#transactions').innerHTML=list.length?list.map(e=>`<article class="transaction"><span class="transaction-icon">${{餐飲:'♨',交通:'↗',住宿:'⌂',門票:'◇',其他:'·'}[e.category]||'$'}</span><div><h4>${e.title}</h4><p>${e.date.replaceAll('-','.')} · ${e.payer}付款 · ${e.category}</p></div><strong>${money(e.amount)}</strong><button class="delete-expense" data-delete="${e.id}" aria-label="刪除 ${e.title}">×</button></article>`).join(''):'<div class="empty">還沒有支出，第一筆旅費等你記下。</div>';localStorage.setItem('miaoli-expenses',JSON.stringify(expenses));}
+function renderLedger(){const funds=expenses.filter(e=>e.category==='入金').reduce((a,e)=>a+e.amount,0), spent=expenses.filter(e=>e.category!=='入金').reduce((a,e)=>a+e.amount,0),balance=funds-spent;$('#balance').textContent=money(balance);$('#fundTotal').textContent=money(funds);$('#spentTotal').textContent=money(spent);$('#budgetProgress').style.width=Math.min(100,funds?spent/funds*100:0)+'%';$('#budgetHint').textContent=balance<0?`已超支 ${money(Math.abs(balance))}`:'5 人 × NT$ 3,000，建議預收 NT$ 15,000';const list=expenses.filter(e=>e.category!=='入金').sort((a,b)=>b.id-a.id);$('#transactions').innerHTML=list.length?list.map(e=>`<article class="transaction"><span class="transaction-icon">${{餐飲:'♨',交通:'↗',住宿:'⌂',門票:'◇',其他:'·'}[e.category]||'$'}</span><div><h4>${e.title}</h4><p>${e.date.replaceAll('-','.')} · ${e.payer}付款 · ${e.category}</p></div><strong>${money(e.amount)}</strong><button class="delete-expense" data-delete="${e.id}" aria-label="刪除 ${e.title}">×</button></article>`).join(''):'<div class="empty">還沒有支出，第一筆旅費等你記下。</div>';localStorage.setItem('miaoli-expenses',JSON.stringify(expenses));}
 function toast(msg){const el=$('#toast');el.textContent=msg;el.classList.add('show');clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>el.classList.remove('show'),2200)}
 
 $('.day-tabs').addEventListener('click',e=>{if(e.target.dataset.day){activeDay=+e.target.dataset.day;renderTabs();renderDay()}});
@@ -50,7 +61,7 @@ $('#expenseForm').date.value='2026-10-09';
 $('#expenseForm').addEventListener('submit',e=>{e.preventDefault();const f=new FormData(e.currentTarget);expenses.push({id:Date.now(),title:f.get('title'),amount:+f.get('amount'),payer:f.get('payer'),category:f.get('category'),date:f.get('date')});e.currentTarget.reset();e.currentTarget.date.value='2026-10-09';renderLedger();toast('已記下這筆支出')});
 $('#transactions').addEventListener('click',e=>{if(e.target.dataset.delete){expenses=expenses.filter(x=>x.id!==+e.target.dataset.delete);renderLedger();toast('已刪除')}});
 $('#clearBtn').addEventListener('click',()=>{if(confirm('確定清空所有支出？公積金入金會保留。')){expenses=expenses.filter(e=>e.category==='入金');renderLedger();toast('支出已清空')}});
-$('#settleBtn').addEventListener('click',()=>{const paid=n=>expenses.filter(e=>e.payer===n&&e.category!=='入金').reduce((a,e)=>a+e.amount,0),mine=paid('我'),theirs=paid('另一半'),personal=mine+theirs,half=personal/2,delta=mine-half;$('#settleContent').innerHTML=`<div class="settle-line"><span>我代墊</span><b>${money(mine)}</b></div><div class="settle-line"><span>另一半代墊</span><b>${money(theirs)}</b></div><div class="settle-line"><span>兩人各自應付</span><b>${money(half)}</b></div><p>${personal===0?'目前沒有需要分攤的個人代墊。':delta>0?`另一半應給我 <b>${money(delta)}</b>`:delta<0?`我應給另一半 <b>${money(Math.abs(delta))}</b>`:'剛剛好，兩人不用互相補款 ♡'}</p>`;$('#settleDialog').showModal()});
+$('#settleBtn').addEventListener('click',()=>{const paid=n=>expenses.filter(e=>e.payer===n&&e.category!=='入金').reduce((a,e)=>a+e.amount,0),paidBy=travelers.map(name=>({name,amount:paid(name)})),personal=paidBy.reduce((sum,p)=>sum+p.amount,0),share=personal/travelers.length;$('#settleContent').innerHTML=paidBy.map(p=>`<div class="settle-line"><span>${p.name}代墊</span><b>${money(p.amount)}</b></div>`).join('')+`<div class="settle-line"><span>五人每人應付</span><b>${money(share)}</b></div><p>${personal===0?'目前沒有需要分攤的個人代墊。':paidBy.map(p=>{const diff=p.amount-share;return diff>0?`${p.name}應收 <b>${money(diff)}</b>`:`${p.name}應付 <b>${money(Math.abs(diff))}</b>`}).join('<br>')}</p>`;$('#settleDialog').showModal()});
 $('.dialog-close').addEventListener('click',()=>$('#settleDialog').close());
 $('#shareTrip').addEventListener('click',async()=>{try{if(navigator.share)await navigator.share({title:document.title,text:'我們的苗栗三天兩夜小旅行',url:location.href});else{await navigator.clipboard.writeText(location.href);toast('旅程連結已複製')}}catch(e){if(e.name!=='AbortError')toast('分享功能暫時無法使用')}});
 renderTabs();renderDay();renderReminders();renderLedger();

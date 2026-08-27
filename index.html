@@ -13,7 +13,7 @@
 <body>
   <header class="hero" id="top">
     <nav class="nav shell" aria-label="主要導覽">
-      <a class="brand" href="#top" aria-label="回到首頁"><span>旅</span>兩個人的苗栗</a>
+      <a class="brand" href="#top" aria-label="回到首頁"><span>旅</span>苗栗小旅行</a>
       <div class="nav-links">
         <a href="#itinerary">行程</a><a href="#reminders">提醒</a><a href="#ledger">記帳</a>
       </div>
@@ -28,7 +28,7 @@
         <button class="btn ghost" id="shareTrip" type="button">分享旅程</button>
       </div>
       <div class="trip-facts" aria-label="旅程摘要">
-        <div><strong>3</strong><span>天的小冒險</span></div><div><strong>2</strong><span>個人的回憶</span></div><div><strong>14</strong><span>站山海風景</span></div>
+        <div><strong>3</strong><span>天的小冒險</span></div><div><strong>5</strong><span>個人的回憶</span></div><div><strong>14</strong><span>站山海風景</span></div>
       </div>
     </div>
   </header>
@@ -36,7 +36,7 @@
   <main>
     <section class="intro shell" aria-labelledby="trip-title">
       <div><p class="section-kicker">THE JOURNEY</p><h2 id="trip-title">山與海之間，<br>收藏我們的秋日。</h2></div>
-      <p>從苑裡藺草香、白沙屯信仰，到通霄風車與銅鑼茶香。行程保留了剛剛好的空白，讓兩個人能慢下來，好好看風景，也好好看彼此。</p>
+      <p>從苑裡藺草香、白沙屯信仰，到通霄風車與銅鑼茶香。行程保留了剛剛好的空白，讓我們五個人慢下來，一起好好看風景、收藏回憶。</p>
     </section>
 
     <section class="itinerary shell" id="itinerary" aria-labelledby="itinerary-title">
@@ -47,7 +47,7 @@
 
     <section class="reminders-band" id="reminders">
       <div class="shell reminder-layout">
-        <div><p class="section-kicker light">BEFORE WE GO</p><h2>出發前，別忘了。</h2><p class="muted-light">把繁瑣的事先安排好，到了苗栗就只管牽手、散步、吃好吃的。</p></div>
+        <div><p class="section-kicker light">BEFORE WE GO</p><h2>出發前，別忘了。</h2><p class="muted-light">把繁瑣的事先安排好，到了苗栗就只管散步、吃好吃的。</p></div>
         <div class="reminder-list" id="reminderList"></div>
       </div>
     </section>
@@ -59,12 +59,12 @@
           <span class="label">公積金餘額</span><strong id="balance">NT$ 0</strong>
           <div class="balance-meta"><span>已收 <b id="fundTotal">$0</b></span><span>已花 <b id="spentTotal">$0</b></span></div>
           <div class="progress"><i id="budgetProgress"></i></div>
-          <small id="budgetHint">建議每人預收 NT$ 3,000</small>
+          <small id="budgetHint">5 人 × NT$ 3,000，建議預收 NT$ 15,000</small>
         </div>
         <form class="expense-form" id="expenseForm">
           <h3>新增一筆</h3>
           <label>品項<input name="title" required maxlength="30" placeholder="例如：晚餐"></label>
-          <div class="form-row"><label>金額<input name="amount" required type="number" min="1" inputmode="numeric" placeholder="0"></label><label>付款人<select name="payer"><option>我</option><option>另一半</option><option>公積金</option></select></label></div>
+          <div class="form-row"><label>金額<input name="amount" required type="number" min="1" inputmode="numeric" placeholder="0"></label><label>付款人<select name="payer"><option>純瑄</option><option>豐勳</option><option>旅伴 A</option><option>旅伴 B</option><option>旅伴 C</option><option>公積金</option></select></label></div>
           <div class="form-row"><label>分類<select name="category"><option>餐飲</option><option>交通</option><option>住宿</option><option>門票</option><option>其他</option></select></label><label>日期<input name="date" required type="date"></label></div>
           <button class="btn primary full" type="submit">記下這一筆 ＋</button>
         </form>
@@ -76,7 +76,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <dialog id="settleDialog"><button class="dialog-close" type="button" aria-label="關閉">×</button><p class="section-kicker">SETTLEMENT</p><h2>旅費結算</h2><div id="settleContent"></div></dialog>
-  <footer><div class="shell"><span>兩個人的苗栗小旅行</span><span>願每一段路，都有你在身旁。</span></div></footer>
+  <footer><div class="shell"><span>苗栗小旅行</span><span>願每一段路，都有你在身旁。</span></div></footer>
   <script src="app.js"></script>
 </body>
 </html>
